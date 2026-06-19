@@ -1,0 +1,195 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fafbfc;
+  --foreground: #111827;
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-foreground: #ffffff;
+  --secondary: #f3f4f6;
+  --secondary-foreground: #374151;
+  --muted: #6b7280;
+  --muted-foreground: #6b7280;
+  --border: #e5e7eb;
+  --accent: #3b82f6;
+  --success: #059669;
+  --error: #dc2626;
+  --ring: #2563eb;
+}
+
+.dark {
+  --background: #09090b;
+  --foreground: #f4f4f5;
+  --card: #18181b;
+  --card-foreground: #f4f4f5;
+  --primary: #3b82f6;
+  --primary-hover: #60a5fa;
+  --primary-foreground: #ffffff;
+  --secondary: #27272a;
+  --secondary-foreground: #d4d4d8;
+  --muted: #a1a1aa;
+  --muted-foreground: #a1a1aa;
+  --border: #27272a;
+  --accent: #60a5fa;
+  --success: #34d399;
+  --error: #f87171;
+  --ring: #3b82f6;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-success: var(--success);
+  --color-error: var(--error);
+  --color-ring: var(--ring);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+@media (min-width: 1024px) {
+  html {
+    font-size: 17px;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background-color: color-mix(in srgb, var(--primary) 22%, transparent);
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes menu-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes backdrop-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out forwards;
+}
+
+.animate-menu-in {
+  animation: menu-slide-down 0.22s ease-out forwards;
+}
+
+.animate-backdrop-in {
+  animation: backdrop-fade 0.2s ease-out forwards;
+}
+
+.text-accent-brand {
+  color: var(--primary);
+}
+
+.bg-brand {
+  background-color: var(--primary);
+}
+
+.bg-brand:hover {
+  background-color: var(--primary-hover);
+}
+
+.glass {
+  background: color-mix(in srgb, var(--card) 88%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.section-padding {
+  @apply py-16 sm:py-20 lg:py-24;
+}
+
+.nav-link {
+  @apply relative text-[0.9375rem] font-medium text-muted-foreground transition-colors duration-200 ease-out;
+}
+
+.nav-link:hover {
+  color: var(--foreground);
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--primary);
+  border-radius: 1px;
+  transition: width 0.22s ease-out;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.interactive-card {
+  @apply transition-all duration-200 ease-out;
+}
+
+.interactive-card:hover {
+  border-color: color-mix(in srgb, var(--primary) 35%, var(--border));
+  box-shadow: 0 4px 24px -4px color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
+.prose-content p {
+  @apply text-base leading-[1.75] sm:text-[1.0625rem];
+}
+
+.prose-content h3 {
+  @apply text-xl font-semibold sm:text-[1.375rem];
+}
+
+.prose-content li {
+  @apply text-base leading-[1.75] sm:text-[1.0625rem];
+}
