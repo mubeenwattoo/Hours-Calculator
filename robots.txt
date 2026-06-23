@@ -1,0 +1,4 @@
+User-Agent: *
+Allow: /
+
+Sitemap: https://mubeenwattoo.github.io/Hours-Calculator/sitemap.xml
