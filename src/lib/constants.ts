@@ -116,7 +116,7 @@ export const EXAMPLES: ExampleRow[] = [
 export const FEATURES = [
   {
     title: "Instant Results",
-    description: "Live calculations update as you type — no waiting, no page reloads.",
+    description: "Click Calculate for instant results — accurate totals in one step.",
     icon: "Zap",
   },
   {

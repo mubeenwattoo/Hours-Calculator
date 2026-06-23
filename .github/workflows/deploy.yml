@@ -33,6 +33,10 @@ jobs:
         env:
           NEXT_PUBLIC_BASE_PATH: /Hours-Calculator
           NEXT_PUBLIC_SITE_URL: https://mubeenwattoo.github.io/Hours-Calculator
+          BUILD_TIMESTAMP: ${{ github.sha }}
+
+      - name: Verify build output
+        run: grep -q "Ready to calculate" out/index.html
 
       - name: Deploy to gh-pages branch
         uses: JamesIves/github-pages-deploy-action@v4
