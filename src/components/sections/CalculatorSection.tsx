@@ -11,7 +11,7 @@ import {
   RotateCcw,
   Timer,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { SiteContainer } from "@/components/ui/SiteContainer";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -33,6 +33,20 @@ const inputClass =
 
 const labelClass = "mb-1 block text-xs font-medium text-foreground";
 
+function buildInputSnapshot(input: {
+  mode: CalculationMode;
+  startDate: string;
+  endDate: string;
+  weekdaysOnly: boolean;
+  startTime: string;
+  endTime: string;
+  breakMinutes: string;
+  overtimeRate: string;
+  overtimeThreshold: string;
+}) {
+  return JSON.stringify(input);
+}
+
 export function CalculatorSection() {
   const [mode, setMode] = useState<CalculationMode>("single");
   const [startDate, setStartDate] = useState(getTodayDateString);
@@ -44,36 +58,44 @@ export function CalculatorSection() {
   const [overtimeRate, setOvertimeRate] = useState("");
   const [overtimeThreshold, setOvertimeThreshold] = useState("8");
   const [copyStatus, setCopyStatus] = useState<"idle" | "success" | "error">("idle");
+  const [result, setResult] = useState<CalculationResult | null>(null);
+  const [submittedSnapshot, setSubmittedSnapshot] = useState<string | null>(null);
 
   const breakNum = parseInt(breakMinutes, 10) || 0;
   const thresholdNum = parseFloat(overtimeThreshold) || 8;
   const rateNum = overtimeRate ? parseFloat(overtimeRate) : undefined;
 
-  const result: CalculationResult = useMemo(
-    () =>
-      calculateHoursWithDates({
-        mode,
-        startDate,
-        endDate: mode === "range" ? endDate : startDate,
-        weekdaysOnly,
-        startTime,
-        endTime,
-        breakMinutes: breakNum,
-        overtimeThresholdHours: thresholdNum,
-        overtimeRate: rateNum,
-      }),
-    [
+  const currentSnapshot = buildInputSnapshot({
+    mode,
+    startDate,
+    endDate,
+    weekdaysOnly,
+    startTime,
+    endTime,
+    breakMinutes,
+    overtimeRate,
+    overtimeThreshold,
+  });
+
+  const activeResult =
+    submittedSnapshot === currentSnapshot ? result : null;
+
+  const handleCalculate = () => {
+    const calculated = calculateHoursWithDates({
       mode,
       startDate,
-      endDate,
+      endDate: mode === "range" ? endDate : startDate,
       weekdaysOnly,
       startTime,
       endTime,
-      breakNum,
-      thresholdNum,
-      rateNum,
-    ],
-  );
+      breakMinutes: breakNum,
+      overtimeThresholdHours: thresholdNum,
+      overtimeRate: rateNum,
+    });
+    setResult(calculated);
+    setSubmittedSnapshot(currentSnapshot);
+    setCopyStatus("idle");
+  };
 
   const handleReset = () => {
     const today = getTodayDateString();
@@ -86,13 +108,15 @@ export function CalculatorSection() {
     setBreakMinutes("60");
     setOvertimeRate("");
     setOvertimeThreshold("8");
+    setResult(null);
+    setSubmittedSnapshot(null);
     setCopyStatus("idle");
   };
 
   const handleCopy = async () => {
-    if (!result.isValid) return;
+    if (!activeResult?.isValid) return;
     try {
-      await navigator.clipboard.writeText(formatResultForCopy(result));
+      await navigator.clipboard.writeText(formatResultForCopy(activeResult));
       setCopyStatus("success");
       setTimeout(() => setCopyStatus("idle"), 2500);
     } catch {
@@ -112,8 +136,10 @@ export function CalculatorSection() {
       : null;
 
   const showResults =
-    result.isValid && !breakError && !rateError && startDate !== "";
-  const showEmpty = !startTime || !endTime || !startDate;
+    activeResult !== null && activeResult.isValid && !breakError && !rateError;
+  const showError =
+    activeResult !== null && (!activeResult.isValid || breakError || rateError);
+  const showEmpty = activeResult === null;
 
   return (
     <section
@@ -296,7 +322,12 @@ export function CalculatorSection() {
             </details>
 
             <div className="mt-3 flex gap-2">
-              <Button variant="primary" size="sm" className="flex-1">
+              <Button
+                variant="primary"
+                size="sm"
+                className="flex-1"
+                onClick={handleCalculate}
+              >
                 <Timer className="h-3.5 w-3.5" aria-hidden="true" />
                 Calculate
               </Button>
@@ -344,11 +375,13 @@ export function CalculatorSection() {
             <div className="flex flex-1 flex-col">
               {showEmpty ? (
                 <EmptyState />
-              ) : result.error || breakError || rateError ? (
-                <ErrorState message={result.error || breakError || rateError || ""} />
-              ) : showResults ? (
+              ) : showError ? (
+                <ErrorState
+                  message={activeResult?.error || breakError || rateError || ""}
+                />
+              ) : showResults && activeResult ? (
                 <ResultsDisplay
-                  result={result}
+                  result={activeResult}
                   startTime={startTime}
                   endTime={endTime}
                 />
@@ -422,9 +455,9 @@ function EmptyState() {
   return (
     <div className="flex flex-1 flex-col items-center justify-center rounded-md border border-dashed border-border py-6 text-center">
       <Clock className="h-8 w-8 text-muted-foreground/60" aria-hidden="true" />
-      <p className="mt-2 text-sm font-medium text-foreground">Results appear here</p>
+      <p className="mt-2 text-sm font-medium text-foreground">Ready to calculate</p>
       <p className="mt-0.5 text-xs text-muted-foreground">
-        Updates live as you enter times
+        Enter your times, then click Calculate to see results
       </p>
     </div>
   );
